@@ -1,0 +1,14 @@
+---
+- name: User Playbook
+  hosts: all
+  become: yes
+  become_method: sudo
+  tasks:
+  - name: User add
+    user:
+      name: bob
+      state: present
+
+
+    
+
