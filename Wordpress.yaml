@@ -1,0 +1,60 @@
+---
+- name: Install wordpress
+--- 
+- name: Install Wordpress
+  become: true
+  become_method: sudo
+  hosts: all
+  name: "Install packages"
+  tasks: 
+    - 
+      get_url: 
+        dest: /var/www/html
+        url: "https://wordpress.org/latest.tar.gz"
+      name: "Install wordpress"
+    - 
+      name: "unarchive wordpress"
+      unarchive: 
+        dest: /var/www/html
+        remote_src: true
+        src: /var/www/html/wordpress-5.4.1.tar.gz
+    - 
+      name: "install wordpress packages"
+      package: 
+        name: "{{item}}"
+        state: latest
+      with_items: 
+        - httpd
+        - mariadb-server
+        - php
+    - 
+      name: "Move files to html folder"
+      shell: 
+        cmd: "mv /var/www/html/wordpress/* /var/www/html"
+    - 
+      name: shell
+      shell: 
+        cmd: "systemctl start httpd"
+    - 
+      name: shell
+      shell: 
+        cmd: "systemctl enable httpd"
+    - 
+      name: shell
+      shell: 
+        cmd: "systemctl restart httpd"
+    - 
+      file: 
+        group: apache
+        owner: apache
+        path: /var/www/html/
+      name: "Change file ownership"
+    - 
+      name: shell
+      shell: 
+        cmd: "setenforce 0"
+  user: centos
+ - name: change owner
+    shell:
+      cmd: chown -R apache:apache /var/www/html
+
